@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "U9hk2Oh4Kn3rl2R6RitgtX+3g0RtCjEveLcWjDZqr8Z/+xJ5S+Xx6pKh4yT6vYg4p4JzUsQZmw3oKRVOZSu7LQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Sarah\\Desktop\\MarketManagementSystem-ConsoleApp\\MarketManagementSystem\\MarketManagementSystem\\MarketManagementSystem.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Sarah\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
