@@ -6,8 +6,9 @@ namespace MarketManagementSystem.Infrastructure.Enums
         Sweets,
         Diary,
         Grossary,
-        Qastronom,
-        MəktəbliLəvazimatları
+        Gastronomy,
+        Drinks,
+        OfficeSupplies
 
     }
 }

@@ -37,7 +37,7 @@ namespace MarketManagementSystem
                             " 6 - Qiymet araligina gore mehsullari goster\n" +
                             " 7 - Mehsullar arasinda ada gore axtaris et\n" +
                             " 0 - Məhsullar üzrə əməliyyatlardan çıxış");
-                        Console.WriteLine("Mehsullar uzerinde emeliyyat aparmaq ucun 1-7 intervalinda reqem daxil edin: ");
+                        Console.WriteLine("Məhsullar üzərində əməliyyat aparmaq üçün 0-7 intervalında rəqəm daxil edin: ");
                         ProductOperations();
                         break;
                     case 2:
@@ -90,25 +90,31 @@ namespace MarketManagementSystem
                         operations.AddProduct();
                         break;
                     case 2:
-                        Console.WriteLine("-- Mehsul uzerinde duzelis et --");
+                        Console.WriteLine("-- Məhsul məlumatlarına düzəliş et --");
+                        operations.EditProdInfo();
                         break; 
                     case 3:
-                        Console.WriteLine("-- Mehsulu sil --");
+                        Console.WriteLine("------ Mehsulu sil ------");
+                        operations.DeleteProduct();
                         break; 
                     case 4:
-                        Console.WriteLine("-- Butun mehsullari goster --");
+                        Console.WriteLine("------ Bütün məhsullar ------");
+                        operations.ShowProducts(operations.Products);
                         break; 
                     case 5:
-                        Console.WriteLine("-- Categoriyasina gore mehsullari goster --");
+                        Console.WriteLine("----- Categoriyasina gore mehsullari goster -----");
+                        operations.GetProductByCategory();
                         break; 
                     case 6:
-                        Console.WriteLine("-- Qiymet araligina gore mehsullari goster --");
+                        Console.WriteLine("---- Qiymet araligina gore mehsullari goster ----");
+                        operations.GetProductByPriceRange();
                         break; 
                     case 7:
-                        Console.WriteLine("-- Mehsullar arasinda ada gore axtaris et --");
+                        Console.WriteLine("---- Mehsullar arasinda ada gore axtaris et ----");
+                        operations.GetProductByName();
                         break;
                     default:
-                        Console.WriteLine("Əməliyyat aparmaq üçün 1 - 3 intervalında rəqəm daxil edə bilərsiniz.");
+                        Console.WriteLine("Əməliyyat aparmaq üçün 0 - 7 intervalında rəqəm daxil edə bilərsiniz.");
                         break;
                 }
             } while (SlctInt != 0);
