@@ -15,13 +15,13 @@ namespace MarketManagementSystem.Infrastructure.Interfaces
         public void GetProductByPriceRange();
         public void GetProductByName();
 
-        public void AddSale(string prodName, int count);
+        public void AddSale(int SaleItemCount);
         public void DeleteSaleItem();
         public void ShowSales();
         public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate);
         public List<Sale> GetSalesByDay(DateTime day);
         public List<Sale> GetSalesByAmount(double minAmount, double maxAmount);
-        public List<Sale> GetSalesBySaleNo(int SaleNo);
+        public List<Sale> GetSalesBySaleNo(string SaleNo);
         
     }
 }

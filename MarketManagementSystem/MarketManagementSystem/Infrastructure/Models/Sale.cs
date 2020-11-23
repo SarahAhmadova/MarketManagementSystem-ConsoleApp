@@ -6,9 +6,9 @@ namespace MarketManagementSystem.Infrastructure.Models
 {
    public class Sale
     {
-        int SaleNo;
-        double Amount;
-        SaleItem item;
-        DateTime date;
+        public int SaleNo;
+        public double Amount;
+        public List<SaleItem> SaleItems { get; set; }
+        public DateTime date;
     }
 }

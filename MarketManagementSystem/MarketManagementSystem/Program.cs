@@ -6,6 +6,8 @@ namespace MarketManagementSystem
 {
     class Program
     {
+        static Marketable operations = new Marketable();
+
         static void Main(string[] args)
         {
             
@@ -68,7 +70,6 @@ namespace MarketManagementSystem
         public static void ProductOperations()
         {
             int SlctInt;
-            Marketable operations = new Marketable();
             do
             {
                 string slct = Console.ReadLine();
@@ -142,12 +143,14 @@ namespace MarketManagementSystem
                             "- 3 Sistemden cixmaq"); 
                         continue;
                     case 1:
-                        Console.WriteLine("frst");
+                        Console.WriteLine("------- Satış əlavə et -------");
+                        addSale();
                         break;
                     case 2:
-                        Console.WriteLine("2fdg");
+                        Console.WriteLine("------ Məhsulun geri qaytarılması ------");
                         break;
                     case 3:
+                        Console.WriteLine("------ Satışın silinməsi ------");
                         Console.WriteLine("3fdg");
                         break;
                     case 4:
@@ -172,6 +175,18 @@ namespace MarketManagementSystem
             
         }
 
+        static void addSale()
+        {
+            Console.WriteLine("Satışdakı məhsul növlərinin sayını daxil edin: ");
+            string prodCount = Console.ReadLine();
+            int productCount;
+            while (!int.TryParse(prodCount, out productCount))
+            {
+                Console.WriteLine("Reqem daxil etmelisinz.");
+                prodCount = Console.ReadLine();
+            }
+            operations.AddSale(productCount);
+        }
     }
 }
 /* 
@@ -181,13 +196,5 @@ namespace MarketManagementSystem
     -2 Satislar uzerinde emeliyyat aparmaq
     -3 Sistemden cixmaq
 	
-1.1 1 secildikde Mehsullar uzerinde aparila bilinecek emeliyyatlarla bagli secimler gosterilir:
-    
-    - 1 Yeni mehsul elave et  - userden yeni mehsul yaradilmasi ucun lazim olan melumatlari daxil edilmelidir
-    - 2 Mehsul uzerinde duzelis et -  duzelis edilecek mehsulun code-u ve duzelis melumatlari daxil edilmelidir
-    - 3 Mehsulu sil - mehsulu kodu daxil edilmelidir
-    - 4 Butun mehsullari goster - butun mehsullar gosterilecek (kodu,adi,categoriyasi,sayi,qiymeti)
-    - 5 Categoriyasina gore mehsullari goster - usere var olan kateqoriyalar gosteilecek ve onlar arasinda bir secim etmelidir ve secilmis kateqoriyadan olan butun mehsullar gosterilir (kodu,adi,categoriyasi,sayi,qiymeti)
-    - 6 Qiymet araligina gore mehsullari goster - userden minmum ve maximum qiymetleri daxil etmesi istenilir ve hemin qiymet araliginda olan mehsullar gosterilir (kodu, adi,categoriyasi,sayi,qiymeti)
-    - 7 Mehsullar arasinda ada gore axtaris et - useden text daxil etmesi istenilir ve adinda hemin text olan butun mehsullar gosterilir (kodu, adi,categoriyasi,sayi,qiymeti)
+
  */

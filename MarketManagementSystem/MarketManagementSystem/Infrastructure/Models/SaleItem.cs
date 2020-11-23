@@ -4,9 +4,9 @@ using System.Text;
 
 namespace MarketManagementSystem.Infrastructure.Models
 {
-    class SaleItem:Product
+    public class SaleItem:Product
     {
-        int No;
-        int prodCount;
+        public int No;
+        public int prodCount;
     }
 }
