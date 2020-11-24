@@ -1,12 +1,11 @@
 ﻿using MarketManagementSystem.Infrastructure.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Text;
 using MarketManagementSystem.Infrastructure.Interfaces;
 using MarketManagementSystem.Infrastructure.Enums;
 using ConsoleTables;
-
+using System.ComponentModel;
 
 namespace MarketManagementSystem.Infrastructure.Services
 {
@@ -15,10 +14,10 @@ namespace MarketManagementSystem.Infrastructure.Services
     {
         public List<Sale> Sales { get; set; }
         public Marketable() {
-            List<Sale> sls = new List<Sale>();
+            Sales = new List<Sale>();
         }
-
-    
+        private int SaleId = 0;
+        
         
         List<Product> _products = new List<Product> {
            new Product{
@@ -51,6 +50,23 @@ namespace MarketManagementSystem.Infrastructure.Services
             }
         };
         public List<Product> Products => _products;
+
+        public static T Convert<T>(string input)
+        {
+            try
+            {
+                var converter = TypeDescriptor.GetConverter(typeof(T));
+                if (converter != null)
+                {
+                    return (T)converter.ConvertFromString(input);
+                }
+                return default(T);
+            }
+            catch (NotSupportedException)
+            {
+                return default(T);
+            }
+        }
 
         public void AddProduct()
         {
@@ -269,6 +285,7 @@ namespace MarketManagementSystem.Infrastructure.Services
             else Console.WriteLine($"{category} kateqoriyası mövcu deyil.");
 
         }
+
         public void GetProductByPriceRange()
         {
             Console.Write("Minimum qiymət: ");
@@ -304,60 +321,108 @@ namespace MarketManagementSystem.Infrastructure.Services
 
         }
 
-        public void AddSale(int productCount) { }
-        //{
-        //    Sale sale = new Sale();
-        //    Random SaleNumb = new Random();
-        //    Console.WriteLine("Satış kodu: " + SaleNumb.Next(100000, 999999));
-            
-        //    for (int i = 0; i < productCount; i++)
-        //    {
-        //        SaleItem item = new SaleItem();
-        //        Console.Write($"{i+1} Məhsulun kodu: ");
-        //        string prodCode= Console.ReadLine();
-        //        Product saledProd = Products.Find(p => p.ProductCode == prodCode);
-        //        if (saledProd!=null && saledProd.Quantity>=productCount)
-        //        {
-        //            item.No = i + 1;
-        //            item.ProductCode = prodCode;
-        //            item.Name = saledProd.Name;
-        //            item.Price = saledProd.Price;
-        //            item.Quantity = saledProd.Quantity;
-        //            item.prodCount = productCount;
-        //            Console.WriteLine(item.Name);
-        //            sale.SaleItems.Add(item);
-        //            sale.Amount += item.Price * productCount;
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine($"{prodCode} kodlu məhsul mövcud deyil!");
-        //            continue;
-        //        }
-        //        Console.Write("Məhsulun sayı: ");
-
-        //        string ItemCount=Console.ReadLine();
-        //        int SaleItemCount;
-        //        while (!int.TryParse(ItemCount, out SaleItemCount))
-        //        {
-        //            Console.WriteLine("Reqem daxil etmelisinz.");
-        //            ItemCount = Console.ReadLine();
-        //        }
-        //    }
-        //    sale.date = DateTime.Now;
-        //    Console.WriteLine($"Məbləğ:         {sale.Amount}");
-        //    Console.WriteLine(sale.date);
-
-        //    Sales.Add(sale);
-        //}
-
-        public void DeleteSaleItem()
+        public void AddSale(int productCount) 
         {
+            Sale sale = new Sale();
+            sale.SaleNo = ++SaleId;
+            sale.SaleItems = new List<SaleItem>();
             
+            for (int i = 1; i<=productCount; i++)
+            {
+                SaleItem item = new SaleItem();
+                Console.Write($"{i} Məhsulun kodu: ");
+                string prodCode = Console.ReadLine();
+                Product saledProd = Products.Find(p => p.ProductCode == prodCode);
+                if (saledProd!=null && saledProd.Quantity>=productCount)
+                {
+                    Console.Write("Məhsulun sayı: ");
+                    string ItemCount = Console.ReadLine();
+                    int SaleItemCount;
+                    while (!int.TryParse(ItemCount, out SaleItemCount))
+                    {
+                        Console.WriteLine("Reqem daxil etmelisinz.");
+                        ItemCount = Console.ReadLine();
+                    }
+
+                    item.No = i;
+                    item.ProductCode = prodCode;
+                    item.Name = saledProd.Name;
+                    item.Price = saledProd.Price;
+                    item.Quantity = saledProd.Quantity;
+                    item.Category = saledProd.Category;
+                    item.prodCount = SaleItemCount;
+                    
+                    Console.WriteLine(item.Name);
+                    sale.SaleItems.Add(item);
+                    sale.Amount += item.Price*SaleItemCount;
+                }
+                else
+                {
+                    Console.WriteLine($"{prodCode} kodlu məhsul mövcud deyil!");
+                    continue;
+                }
+                
+            }
+
+            sale.date = DateTime.Now;
+
+            Console.WriteLine(sale.SaleItems.Count);
+            Sales.Add(sale);
+            showSale(sale.SaleNo.ToString());
+        }
+
+        public void showSale(string SaleNo)
+        {
+            Sale sale = Sales.Find(s => s.SaleNo.ToString() == SaleNo);
+            if (sale != null) {
+                Console.WriteLine();
+                var table = new ConsoleTable("No", "Product Name", "Count", "Price", "Amount");
+                foreach (var item in sale.SaleItems)
+                {
+                    table.AddRow(item.No, item.Name, item.prodCount, item.Price, (item.prodCount * item.Price).ToString("#.##"));
+                }
+                table.AddRow("", "", "", "", "");
+                table.AddRow("Total Amount:", "", "", "", sale.Amount.ToString("#.##"));
+                table.AddRow("Date: ", sale.date, "", "", "");
+                table.Write((Format.Minimal));
+            }
+            else Console.WriteLine($"{SaleNo} nömrəli satış mövcud deyil.");
+            //Console.table("","");
+        }
+        public void DeleteSaleItem(string saleNo)
+        {
+            Sale sale = Sales.Find(s => s.SaleNo.ToString() == saleNo);
+            if (sale != null)
+            {
+                Console.WriteLine("Çıxarılacaq məhsulun kodu: ");
+                string prodCode = Console.ReadLine();
+                SaleItem item = sale.SaleItems.Find(s => s.ProductCode == prodCode);
+                if (item != null)
+                {
+                    Console.WriteLine("Çıxarılacaq məhsulun sayı: ");
+                    int delProdCount = Convert<int>(Console.ReadLine());
+                    Console.WriteLine(delProdCount+" "+ delProdCount.GetType());
+                    if (delProdCount <= item.prodCount)
+                    {
+                        item.prodCount -= delProdCount;
+                    }
+                }                
+            }
+            else Console.WriteLine($"{saleNo} nömrəli satış mövcud deyil!");
+        }
+        public void DeleteSale(string saleNo)
+        {
+            Sale sale = Sales.Find(s => s.SaleNo.ToString() == saleNo);
+            if (sale != null)
+            {
+                Sales.Remove(sale);
+            }
+            else Console.WriteLine($"{saleNo} nömrəli satış mövcud deyil!");
         }
 
         public List<Sale> GetSalesByAmount(double minAmount, double maxAmount)
         {
-            throw new NotImplementedException();
+            return Sales;
         }
 
         public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate)
@@ -377,7 +442,13 @@ namespace MarketManagementSystem.Infrastructure.Services
 
         public void ShowSales()
         {
-            throw new NotImplementedException();
+            var table = new ConsoleTable("No","Məhsul sayı","Məbləğ","Tarix");
+            
+            foreach (Sale item in Sales)
+            {
+                table.AddRow(item.SaleNo, item.SaleItems.Count,item.Amount,item.date);
+            }
+            table.Write();
         }
     }
 }

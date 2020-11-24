@@ -148,16 +148,21 @@ namespace MarketManagementSystem
                         break;
                     case 2:
                         Console.WriteLine("------ Məhsulun geri qaytarılması ------");
+                        deleteSaleItem();
                         break;
                     case 3:
                         Console.WriteLine("------ Satışın silinməsi ------");
-                        Console.WriteLine("3fdg");
+
                         break;
                     case 4:
-                        Console.WriteLine("4fdg");
+                        Console.WriteLine("------- BÜTÜN SİFARİŞLƏR -------");
+                        operations.ShowSales();
                         break;
                     case 5:
-                        Console.WriteLine("5fdg");
+                        Console.WriteLine("------- BÜTÜN SİFARİŞLƏR -------");
+                        Console.Write("Sifariş nömrəsi: ");
+                        string saleNo=Console.ReadLine();
+                        operations.showSale(saleNo);
                         break;
                     case 6:
                         Console.WriteLine("6fdg");
@@ -186,6 +191,19 @@ namespace MarketManagementSystem
                 prodCount = Console.ReadLine();
             }
             operations.AddSale(productCount);
+        }
+        static void deleteSale()
+        {
+            Console.WriteLine("Satış nömrəsini daxil edin: ");
+            string saleNo = Console.ReadLine();
+            operations.DeleteSale(saleNo);
+        }
+        static void deleteSaleItem()
+        {
+            Console.WriteLine("Satış nömrəsi: ");
+            string saleNo = Console.ReadLine();
+            operations.DeleteSaleItem(saleNo);
+            operations.showSale(saleNo);
         }
     }
 }

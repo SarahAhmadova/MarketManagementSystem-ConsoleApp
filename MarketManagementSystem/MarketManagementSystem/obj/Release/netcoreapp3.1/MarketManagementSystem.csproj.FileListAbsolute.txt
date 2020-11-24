@@ -13,3 +13,4 @@ C:\Users\Sarah\Desktop\MarketManagementSystem-ConsoleApp\MarketManagementSystem\
 C:\Users\Sarah\Desktop\MarketManagementSystem-ConsoleApp\MarketManagementSystem\MarketManagementSystem\obj\Release\netcoreapp3.1\MarketManagementSystem.dll
 C:\Users\Sarah\Desktop\MarketManagementSystem-ConsoleApp\MarketManagementSystem\MarketManagementSystem\obj\Release\netcoreapp3.1\MarketManagementSystem.pdb
 C:\Users\Sarah\Desktop\MarketManagementSystem-ConsoleApp\MarketManagementSystem\MarketManagementSystem\obj\Release\netcoreapp3.1\MarketManagementSystem.genruntimeconfig.cache
+C:\Users\Sarah\Desktop\MarketManagementSystem-ConsoleApp\MarketManagementSystem\MarketManagementSystem\bin\Release\netcoreapp3.1\ConsoleTables.dll

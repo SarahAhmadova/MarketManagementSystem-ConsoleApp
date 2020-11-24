@@ -16,7 +16,7 @@ namespace MarketManagementSystem.Infrastructure.Interfaces
         public void GetProductByName();
 
         public void AddSale(int SaleItemCount);
-        public void DeleteSaleItem();
+        public void DeleteSaleItem(string saleNo);
         public void ShowSales();
         public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate);
         public List<Sale> GetSalesByDay(DateTime day);
