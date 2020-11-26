@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using MarketManagementSystem.Infrastructure.Models;
 using MarketManagementSystem.Infrastructure.Services;
 
 namespace MarketManagementSystem
@@ -21,11 +23,13 @@ namespace MarketManagementSystem
 
             do
             {
+                Console.Write("Seçiminiz: ");
                 string select = Console.ReadLine();
                 while (!int.TryParse(select, out SelectInt))
                 {
                     Console.WriteLine("Reqem daxil etmelisinz.");
                     select = Console.ReadLine();
+                    Console.Write("Seçiminiz: ");
                 }
                 switch (SelectInt)
                 {
@@ -143,32 +147,38 @@ namespace MarketManagementSystem
                             "- 3 Sistemden cixmaq"); 
                         continue;
                     case 1:
-                        Console.WriteLine("------- Satış əlavə et -------");
+                        Console.WriteLine("------- SATIŞ ƏLAVƏ ET -------");
                         addSale();
                         break;
                     case 2:
-                        Console.WriteLine("------ Məhsulun geri qaytarılması ------");
+                        Console.WriteLine("------ MƏHSULUN GERİ QAYTARILMASI ------");
                         deleteSaleItem();
                         break;
                     case 3:
-                        Console.WriteLine("------ Satışın silinməsi ------");
-
+                        Console.WriteLine("------ SATIŞIN SİLİNMƏSİ ------");
+                        deleteSale();
                         break;
                     case 4:
-                        Console.WriteLine("------- BÜTÜN SİFARİŞLƏR -------");
-                        operations.ShowSales();
+                        Console.WriteLine("------- BÜTÜN SATIŞLAR -------");
+                        operations.ShowSales(operations.Sales);
                         break;
                     case 5:
-                        Console.WriteLine("------- BÜTÜN SİFARİŞLƏR -------");
-                        Console.Write("Sifariş nömrəsi: ");
-                        string saleNo=Console.ReadLine();
-                        operations.showSale(saleNo);
+                        Console.WriteLine("------- SEÇİLMİŞ TARİX ARALIĞINA GÖRƏ SATIŞLAR -------");
+                        ShowSalesByDateRange();
                         break;
                     case 6:
-                        Console.WriteLine("6fdg");
+                        Console.WriteLine("---- SEÇİLMİŞ MƏBLƏĞ ARALIĞINA GÖRƏ SATIŞLAR ----");
+                        ShowSalesByAmountRange();
                         break;
                     case 7:
-                        Console.WriteLine("7fdg");
+                        Console.WriteLine("------- SEÇİLMİŞ TARİXƏ GÖRƏ SATIŞLAR -------");
+                        ShowSalesByDay();
+                        break;
+                    case 8:
+                        Console.WriteLine("---- SATIŞ NÖMRƏSİNƏ GÖRƏ SATIŞ MƏLUMATLARININ ÇIXARILMASI ----");
+                        Console.Write("Satış nömrəsi: ");
+                        string saleNo=Console.ReadLine();
+                        operations.showSale(saleNo);
                         break;
                     default:
                         Console.WriteLine("Əməliyyat aparmaq üçün 1 - 8 intervalında rəqəm daxil edə bilərsiniz.");
@@ -179,7 +189,6 @@ namespace MarketManagementSystem
             } while (SlctInt != 0);
             
         }
-
         static void addSale()
         {
             Console.WriteLine("Satışdakı məhsul növlərinin sayını daxil edin: ");
@@ -196,6 +205,7 @@ namespace MarketManagementSystem
         {
             Console.WriteLine("Satış nömrəsini daxil edin: ");
             string saleNo = Console.ReadLine();
+            Console.WriteLine("dsd");
             operations.DeleteSale(saleNo);
         }
         static void deleteSaleItem()
@@ -205,14 +215,84 @@ namespace MarketManagementSystem
             operations.DeleteSaleItem(saleNo);
             operations.showSale(saleNo);
         }
+        static void ShowSalesByAmountRange()
+        {
+            List<Sale> sales;
+            Console.Write("Minimum məbləğ: ");
+            double mnAmount;
+            string amountMin = Console.ReadLine();
+            while (!double.TryParse(amountMin, out mnAmount))
+            {
+                Console.WriteLine("Rəqəm daxil etməlisiniz.");
+                amountMin = Console.ReadLine();
+            }
+
+            Console.Write("Maksimum məbləğ: ");
+            double mxAmount;
+            string amountMax = Console.ReadLine();
+            while (!double.TryParse(amountMax, out mxAmount))
+            {
+                Console.WriteLine("Rəqəm daxil etməlisiniz.");
+                amountMax = Console.ReadLine();
+            }
+            if (mnAmount < mxAmount)
+            {
+               sales = operations.GetSalesByAmountRange(mnAmount, mxAmount);
+            }
+            else
+            {
+               sales=null;
+               Console.WriteLine("Intervalı düzgün daxil etməmisiniz.");
+            }
+
+            if ( sales!= null)
+            {
+                    operations.ShowSales(sales);
+            }
+            else Console.WriteLine("Bu məbləğ arasında satış tapılmadı.");
+
+        }
+        static void ShowSalesByDateRange()
+        {
+            Console.WriteLine("Başlanğıc tarix (ay.gün.il):");
+            string startDate=Console.ReadLine();
+            DateTime dateSt = new DateTime();
+            while (!DateTime.TryParse(startDate, out dateSt))
+            {
+                Console.WriteLine("Tarixi düzgün daxil etmədiniz. Yeniden cəhd edin!");
+                Console.Write("Tarix (gün.ay.il) : ");
+                startDate = Console.ReadLine();
+            }
+
+            Console.WriteLine("Son tarix (ay.gün.il): ");
+            string endDate = Console.ReadLine();
+            DateTime dateEnd = new DateTime();
+            while (!DateTime.TryParse(endDate, out dateEnd))
+            {
+                Console.WriteLine("Tarixi düzgün daxil etmədiniz. Yeniden cəhd edin!");
+                Console.Write("Tarix (gün.ay.il) : ");
+                endDate = Console.ReadLine();
+            }
+
+            List<Sale> sales = operations.GetSalesByDateRange(dateSt,dateEnd);
+            operations.ShowSales(sales);
+        }
+        static void ShowSalesByDay()
+        {
+            Console.Write("Tarix: (gün.ay.il saat:dəq) ");
+            string dt = Console.ReadLine();
+            DateTime date = new DateTime();
+            while(!DateTime.TryParse(dt,out date))
+            {
+                Console.WriteLine("Tarixi düzgün daxil etmədiniz. Yeniden cəhd edin!");
+                Console.Write("Tarix (gün.ay.il) : "); 
+                dt = Console.ReadLine();
+            }
+            List<Sale> sales=operations.GetSalesByDay(date);
+            operations.ShowSales(sales);
+            Console.WriteLine(date);
+ 
+        }
+
     }
 }
-/* 
- 1.
-   ekrana 3 secim cixir
-    -1 Mehsullar uzerinde emeliyyat aparmaq
-    -2 Satislar uzerinde emeliyyat aparmaq
-    -3 Sistemden cixmaq
-	
-
- */

@@ -6,19 +6,51 @@ using MarketManagementSystem.Infrastructure.Interfaces;
 using MarketManagementSystem.Infrastructure.Enums;
 using ConsoleTables;
 using System.ComponentModel;
+using System.Linq;
 
 namespace MarketManagementSystem.Infrastructure.Services
 {
 
     public class Marketable : IMarketable
     {
+        private int SaleId = 1;
         public List<Sale> Sales { get; set; }
         public Marketable() {
-            Sales = new List<Sale>();
+
+            Sales = new List<Sale> {
+                new Sale{
+                    SaleNo=SaleId,
+                    SaleItems = new List<SaleItem>
+                    {
+                        new SaleItem
+                        {
+                            No=1,
+                            product=Products.Find(p=>p.ProductCode=="009068"),
+                            prodCount=10
+                        }
+
+                    }
+                    ,date=new DateTime(2020,11,20),
+                    Amount= 210
+                },
+                new Sale{
+                    SaleNo=++SaleId,
+                    SaleItems = new List<SaleItem>
+                    {
+                        new SaleItem
+                        {
+                            No=1,
+                            product = Products.Find(p=>p.ProductCode=="005631"),
+                            prodCount=20
+                        }
+
+                    }
+                    ,date=new DateTime(2020,11,22),
+                    Amount= 70
+                }
+            };
+            
         }
-        private int SaleId = 0;
-        
-        
         List<Product> _products = new List<Product> {
            new Product{
                Name="ASTARACAY 500GR EKSTRA CAY",
@@ -50,23 +82,17 @@ namespace MarketManagementSystem.Infrastructure.Services
             }
         };
         public List<Product> Products => _products;
-
-        public static T Convert<T>(string input)
-        {
-            try
-            {
-                var converter = TypeDescriptor.GetConverter(typeof(T));
-                if (converter != null)
-                {
-                    return (T)converter.ConvertFromString(input);
-                }
-                return default(T);
-            }
-            catch (NotSupportedException)
-            {
-                return default(T);
-            }
-        }
+        //public T convertation<T>(T a){
+        //                double maxPrice;
+        //    string inpMaxPrice = Console.ReadLine();
+        //    while (!double.TryParse(inpMaxPrice, out maxPrice))
+        //    {
+        //        Console.WriteLine("Rəqəm daxil etməlisiniz.");
+        //        inpMaxPrice = Console.ReadLine();
+        //    }
+        //    return a;
+        //}
+        
 
         public void AddProduct()
         {
@@ -96,22 +122,23 @@ namespace MarketManagementSystem.Infrastructure.Services
             Array nums = Enum.GetValues(typeof(CategoryType));
             foreach (var item in nums)
             {
-                Console.WriteLine(Array.IndexOf(nums, item) + " - " + item);
+                Console.WriteLine(Array.IndexOf(nums, item) + " - " + item );
             }
             Console.WriteLine("----------------------------------------------------------");
 
             Console.Write("Məhsulun kateqoriyası: ");
             string category = Console.ReadLine();
-            try
+            CategoryType ctgr;
+           
+             while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
             {
-                prod.Category = (CategoryType)Enum.Parse(typeof(CategoryType), category);
+                Console.WriteLine($"\"{category}\" adlı kateqoriya mövcud deyil. Yenidən cəhd edin.");
+                Console.Write("Məhsulun kateqoriyası: ");
+                category = Console.ReadLine();
             }
-            catch
-            {
-                Console.WriteLine("Bu kategoriya movcud deyil");
-                Console.WriteLine($"\"{category}\" adlı kateqoriya əlavə edə bilərsiniz.");
-                return;
-            }
+
+             prod.Category = ctgr;
+
             #endregion
 
             #region productQuantitiy
@@ -345,16 +372,12 @@ namespace MarketManagementSystem.Infrastructure.Services
                     }
 
                     item.No = i;
-                    item.ProductCode = prodCode;
-                    item.Name = saledProd.Name;
-                    item.Price = saledProd.Price;
-                    item.Quantity = saledProd.Quantity;
-                    item.Category = saledProd.Category;
+                    item.product = saledProd;
                     item.prodCount = SaleItemCount;
-                    
-                    Console.WriteLine(item.Name);
+                    saledProd.Quantity -= SaleItemCount;
+                    Console.WriteLine(saledProd.Name);
                     sale.SaleItems.Add(item);
-                    sale.Amount += item.Price*SaleItemCount;
+                    sale.Amount += saledProd.Price*SaleItemCount;
                 }
                 else
                 {
@@ -379,7 +402,7 @@ namespace MarketManagementSystem.Infrastructure.Services
                 var table = new ConsoleTable("No", "Product Name", "Count", "Price", "Amount");
                 foreach (var item in sale.SaleItems)
                 {
-                    table.AddRow(item.No, item.Name, item.prodCount, item.Price, (item.prodCount * item.Price).ToString("#.##"));
+                    table.AddRow(item.No, item.product.Name, item.prodCount, item.product.Price, (item.prodCount * item.product.Price).ToString("#.##"));
                 }
                 table.AddRow("", "", "", "", "");
                 table.AddRow("Total Amount:", "", "", "", sale.Amount.ToString("#.##"));
@@ -396,15 +419,22 @@ namespace MarketManagementSystem.Infrastructure.Services
             {
                 Console.WriteLine("Çıxarılacaq məhsulun kodu: ");
                 string prodCode = Console.ReadLine();
-                SaleItem item = sale.SaleItems.Find(s => s.ProductCode == prodCode);
+                SaleItem item = sale.SaleItems.Find(s => s.product.ProductCode == prodCode);
                 if (item != null)
                 {
                     Console.WriteLine("Çıxarılacaq məhsulun sayı: ");
-                    int delProdCount = Convert<int>(Console.ReadLine());
-                    Console.WriteLine(delProdCount+" "+ delProdCount.GetType());
+                    int delProdCount;
+                    string count= Console.ReadLine();
+                    while (!int.TryParse(count, out delProdCount))
+                    {
+                        Console.WriteLine("Rəqəm daxil etməlisiniz.");
+                        count = Console.ReadLine();
+                    }
+
                     if (delProdCount <= item.prodCount)
                     {
                         item.prodCount -= delProdCount;
+                        Products.Find(p => p.ProductCode == prodCode).Quantity += delProdCount;
                     }
                 }                
             }
@@ -415,36 +445,43 @@ namespace MarketManagementSystem.Infrastructure.Services
             Sale sale = Sales.Find(s => s.SaleNo.ToString() == saleNo);
             if (sale != null)
             {
+                List<SaleItem> saleItems = sale.SaleItems;
+                foreach  (SaleItem item in saleItems)
+                {
+                  Products.Find(p=>p.ProductCode==item.product.ProductCode).Quantity+= item.prodCount;
+                    Console.WriteLine(item.prodCount);
+                }
                 Sales.Remove(sale);
+                
             }
             else Console.WriteLine($"{saleNo} nömrəli satış mövcud deyil!");
         }
 
-        public List<Sale> GetSalesByAmount(double minAmount, double maxAmount)
+        public List<Sale> GetSalesByAmountRange(double mnAmount, double  mxAmount)
         {
-            return Sales;
+            return Sales.FindAll(s => s.Amount >= mnAmount && s.Amount <= mxAmount);
         }
 
         public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate)
         {
-            throw new NotImplementedException();
+            return Sales.FindAll(s => s.date.Date >= startDate.Date && s.date.Date <= endDate.Date);
         }
 
         public List<Sale> GetSalesByDay(DateTime day)
         {
-            throw new NotImplementedException();
+            return Sales.FindAll(s => s.date.Date == day.Date);
         }
 
-        public List<Sale> GetSalesBySaleNo(string SaleNo)
+        public Sale GetSalesBySaleNo(string SaleNo)
         {
-            throw new NotImplementedException();
+            return Sales.Find(s => s.SaleNo.ToString() == SaleNo);
         }
 
-        public void ShowSales()
+        public void ShowSales(List <Sale> sales)
         {
             var table = new ConsoleTable("No","Məhsul sayı","Məbləğ","Tarix");
             
-            foreach (Sale item in Sales)
+            foreach (Sale item in sales)
             {
                 table.AddRow(item.SaleNo, item.SaleItems.Count,item.Amount,item.date);
             }

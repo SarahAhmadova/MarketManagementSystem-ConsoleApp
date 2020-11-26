@@ -17,11 +17,11 @@ namespace MarketManagementSystem.Infrastructure.Interfaces
 
         public void AddSale(int SaleItemCount);
         public void DeleteSaleItem(string saleNo);
-        public void ShowSales();
+        public void ShowSales(List<Sale> sales);
         public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate);
         public List<Sale> GetSalesByDay(DateTime day);
-        public List<Sale> GetSalesByAmount(double minAmount, double maxAmount);
-        public List<Sale> GetSalesBySaleNo(string SaleNo);
+        public List<Sale> GetSalesByAmountRange(double mnAmount, double mxAmount);
+        public Sale GetSalesBySaleNo(string SaleNo);
         
     }
 }
