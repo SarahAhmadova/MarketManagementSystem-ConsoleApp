@@ -1,22 +1,26 @@
 ﻿using MarketManagementSystem.Infrastructure.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using MarketManagementSystem.Infrastructure.Interfaces;
 using MarketManagementSystem.Infrastructure.Enums;
 using ConsoleTables;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
+using System.Globalization;
 
 namespace MarketManagementSystem.Infrastructure.Services
 {
 
     public class Marketable : IMarketable
     {
+      
         private int SaleId = 1;
         public List<Sale> Sales { get; set; }
         public Marketable() {
+            Console.OutputEncoding = Encoding.UTF8;
 
+            // Default filled Sales List
             Sales = new List<Sale> {
                 new Sale{
                     SaleNo=SaleId,
@@ -53,14 +57,14 @@ namespace MarketManagementSystem.Infrastructure.Services
         }
         List<Product> _products = new List<Product> {
            new Product{
-               Name="ASTARACAY 500GR EKSTRA CAY",
+               Name="ASTARAÇAY 500GR EKSTRA ÇAY",
                Price=14.85,
                Category=CategoryType.Drinks,
                Quantity=100,
                ProductCode="009068"
             },
            new Product{
-               Name="YA 1LT ALBALI SIRESI",
+               Name="YA 1LT ALBALI ŞİRƏSİ",
                Price=2.60,
                Category=CategoryType.Drinks,
                Quantity=250,
@@ -82,43 +86,56 @@ namespace MarketManagementSystem.Infrastructure.Services
             }
         };
         public List<Product> Products => _products;
-        //public T convertation<T>(T a){
-        //                double maxPrice;
-        //    string inpMaxPrice = Console.ReadLine();
-        //    while (!double.TryParse(inpMaxPrice, out maxPrice))
-        //    {
-        //        Console.WriteLine("Rəqəm daxil etməlisiniz.");
-        //        inpMaxPrice = Console.ReadLine();
-        //    }
-        //    return a;
-        //}
-        
+
+
+        #region Check Is Number
+        public static T To<T>(string value)
+        {
+            bool converted = false;
+            T numb = default(T);
+            while (!converted)
+            {
+                try
+                {
+                    numb = (T)Convert.ChangeType(value, typeof(T));
+                    converted = true;
+                }
+                catch
+                {
+                    converted = false;
+                    Console.Write("Rəqəm daxil edin: ");
+                    value = Console.ReadLine();
+                }
+            }
+            return numb;
+        }
+
+        #endregion
 
         public void AddProduct()
         {
-            Console.InputEncoding = Encoding.UTF8;
+            
             Product prod = new Product();
 
             #region productName
             Console.Write("Məhsulun adı: ");
             prod.Name = Console.ReadLine();
+
             #endregion
 
             #region ProductPrice
             Console.Write("Məhsulun qiyməti: ");
-            double price;
             string priceVal = Console.ReadLine();
-            while (!double.TryParse(priceVal, out price))
-            {
-                Console.WriteLine("Rəqəm daxil etməlisiniz.");
-                priceVal = Console.ReadLine();
-            }
-            prod.Price = price;
+            prod.Price = To<double>(priceVal);
             #endregion
 
             #region productCategory
+
+            // ------------------------------------   SHOW CATEGORIES ---------------------------------------
+
             Console.WriteLine("----------------------------------------------------------");
             Console.WriteLine("Məhsulun bu kategoriyaları arasında seçim edə bilərsiniz: ");
+
             Array nums = Enum.GetValues(typeof(CategoryType));
             foreach (var item in nums)
             {
@@ -126,10 +143,12 @@ namespace MarketManagementSystem.Infrastructure.Services
             }
             Console.WriteLine("----------------------------------------------------------");
 
+            // --------------------------------------  ASSIGN CATEGORY ---------------------------------------
+
             Console.Write("Məhsulun kateqoriyası: ");
             string category = Console.ReadLine();
+
             CategoryType ctgr;
-           
              while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
             {
                 Console.WriteLine($"\"{category}\" adlı kateqoriya mövcud deyil. Yenidən cəhd edin.");
@@ -137,20 +156,14 @@ namespace MarketManagementSystem.Infrastructure.Services
                 category = Console.ReadLine();
             }
 
-             prod.Category = ctgr;
+            prod.Category = ctgr;
 
             #endregion
 
             #region productQuantitiy
             Console.Write("Məhsulun miqdarı: ");
-            int quant;
             string quantity = Console.ReadLine();
-            while (!int.TryParse(quantity, out quant))
-            {
-                Console.WriteLine("Rəqəm daxil etməlisiniz.");
-                quantity = Console.ReadLine();
-            }
-            prod.Quantity = quant;
+            prod.Quantity = To<int>(quantity);
             #endregion
 
             #region productCode
@@ -159,26 +172,12 @@ namespace MarketManagementSystem.Infrastructure.Services
             #endregion
 
             _products.Add(prod);
-
-            Console.WriteLine("\n Məhsul əlavə edildi. \n");
-            Console.WriteLine("Məhsullar üzərində əməliyyat aparmaq üçün 0-7 intervalında rəqəm daxil edin: ");
-            Console.WriteLine(" 1 - Yeni mehsul elave et\n" +
-                            " 2 - Mehsul uzerinde duzelis et\n" +
-                            " 3 - Mehsulu sil\n" +
-                            " 4 - Butun mehsullari goster\n" +
-                            " 5 - Categoriyasina gore mehsullari goster\n" +
-                            " 6 - Qiymet araligina gore mehsullari goster\n" +
-                            " 7 - Mehsullar arasinda ada gore axtaris et\n" +
-                            " 0 - Məhsullar üzrə əməliyyatlardan çıxış");
         }
       
-        public void EditProdInfo()
+        public void EditProdInfo(string ProductCode)
         {
-            Console.Write("Düzəliş etmək istədiyiniz məhsul kodunu daxil edin: ");
-            string prodCode = Console.ReadLine();
-            Console.InputEncoding = Encoding.UTF8;
-
-            Product prod = Products.Find(p=>p.ProductCode==prodCode);
+            
+            Product prod = Products.Find(p=>p.ProductCode==ProductCode);
             if (prod!=null)
             {
                 #region productName
@@ -191,18 +190,15 @@ namespace MarketManagementSystem.Infrastructure.Services
                 #region ProductPrice
                 Console.WriteLine($"Məhsulun qiyməti: {prod.Price}");
                 Console.Write("Yeni dəyər: ");
-                double price;
-                string priceVal = Console.ReadLine();
-                while (!double.TryParse(priceVal, out price))
-                {
-                    Console.WriteLine("Rəqəm daxil etməlisiniz.");
-                    priceVal = Console.ReadLine();
-                }
-                prod.Price = price;
+                string price = Console.ReadLine();
+                prod.Price = To<double>(price);
                 Console.WriteLine("");
                 #endregion
 
                 #region productCategory
+
+                // -------------------------------------- SHOW CATEGORIES ----------------------------------------
+
                 Console.WriteLine("----------------------------------------------------------");
                 Console.WriteLine("Məhsulun bu kategoriyaları arasında seçim edə bilərsiniz: ");
                 Array nums = Enum.GetValues(typeof(CategoryType));
@@ -212,186 +208,168 @@ namespace MarketManagementSystem.Infrastructure.Services
                 }
                 Console.WriteLine("----------------------------------------------------------");
 
+                // -------------------------------------- ASSIGN CATEGORY ------------------------------------------
+
                 Console.WriteLine($"Məhsulun kateqoriyası: {prod.Category}");
                 Console.Write("Kateqoriya daxil edin: ");
                 string category = Console.ReadLine();
-                try
+
+                CategoryType ctgr;
+                while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
                 {
-                    prod.Category = (CategoryType)Enum.Parse(typeof(CategoryType), category);
+                    Console.WriteLine($"\"{category}\" adlı kateqoriya mövcud deyil. Yenidən cəhd edin.");
+                    Console.Write("Məhsulun kateqoriyası: ");
+                    category = Console.ReadLine();
                 }
-                catch
-                {
-                    Console.WriteLine("Bu kategoriya movcud deyil");
-                    Console.WriteLine($"\"{category}\" adlı kateqoriya əlavə edə bilərsiniz.");
-                }
+
+                prod.Category = ctgr;
                 Console.WriteLine("");
                 #endregion
 
                 #region productQuantitiy
                 Console.WriteLine($"Məhsulun miqdarı: {prod.Quantity}");
-                int quant;
-                Console.Write("Yeni dəyəri: ");
+                Console.Write("Yeni miqdarı: ");
                 string quantity = Console.ReadLine();
-                while (!int.TryParse(quantity, out quant))
-                {
-                    Console.WriteLine("Rəqəm daxil etməlisiniz.");
-                    quantity = Console.ReadLine();
-                }
-                prod.Quantity = quant;
+                prod.Quantity = To<int>(quantity);
                 #endregion
 
-            }
-            else Console.WriteLine($"{prodCode} kodlu məhsul mövcud deyil.");
-            Console.WriteLine("\nMəhsullar üzərində əməliyyat aparmaq üçün 0-7 intervalında rəqəm daxil edin: ");
+                Console.WriteLine($"\"{ProductCode}\" kodlu məhsul məlumatlarına düzəliş edildi. ");
 
+            }
+            else Console.WriteLine($"{ProductCode} kodlu məhsul mövcud deyil.");
         }
 
-        public void DeleteProduct()
+        public void DeleteProduct(string ProductCode)
         {
-            Console.Write("Silmək istədiyiniz məhsul kodunu daxil edin: ");
-            string prodCode = Console.ReadLine();
-            Product delItem = Products.Find(p => p.ProductCode == prodCode);
+            Product delItem = Products.Find(p => p.ProductCode == ProductCode);
             if (delItem != null)
             {
                 Products.Remove(delItem);
                 Console.WriteLine($"{delItem.Name} məhsulu silindi.");
             }
-            else Console.WriteLine($"{prodCode} kodlu məhsul mövcud deyil.");
+            else Console.WriteLine($"{ProductCode} kodlu məhsul mövcud deyil.");
         }
-        public void ShowProducts(List<Product> lst)
+
+        // ------------------ SHOWS SELECTED PRODUCT LIST ON CONSOLE --------------------
+        public void ShowProducts(List<Product> list)
         {
-            if (lst.Count != 0)
+
+            if (list.Count != 0)
             {
                 var table = new ConsoleTable("No", "Kod", "Kateqoriya", " Məhsul", "Sayı", "Qiyməti");
-                foreach (Product item in lst)
+                foreach (Product item in list)
                 {
                     table.AddRow(Products.IndexOf(item) + 1, item.ProductCode, item.Category, item.Name, item.Quantity, item.Price);
                 }
                 table.Write();
-
-                Console.WriteLine("\nMəhsullar üzərində əməliyyat aparmaq üçün 0-7 intervalında rəqəm daxil edin: ");
-                Console.WriteLine(" 1 - Yeni mehsul elave et\n" +
-                                " 2 - Mehsul uzerinde duzelis et\n" +
-                                " 3 - Mehsulu sil\n" +
-                                " 4 - Butun mehsullari goster\n" +
-                                " 5 - Categoriyasina gore mehsullari goster\n" +
-                                " 6 - Qiymet araligina gore mehsullari goster\n" +
-                                " 7 - Mehsullar arasinda ada gore axtaris et\n" +
-                                " 0 - Məhsullar üzrə əməliyyatlardan çıxış");
             }
-            else Console.WriteLine("Məhsul siyahısı mövcud deyil");
+            else Console.WriteLine("Məhsul siyahısı boşdur.");
         }
-        public void GetProductByCategory()
-        {
-            Console.WriteLine("Məhsulun bu kategoriyaları arasında seçim edə bilərsiniz: ");
-            Array nums = Enum.GetValues(typeof(CategoryType));
-            foreach (var item in nums)
-            {
-                Console.WriteLine(Array.IndexOf(nums, item) + " - " + item);
-            }
-            Console.WriteLine("----------------------------------------------------------\n");
-            Console.Write("Kategoriya adını və nömrəsini daxil edin: ");
 
-            string category = Console.ReadLine();
+        
+        public void GetProductByCategory(string category)
+        {
+           
             CategoryType ctgr;
-            try
+            while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
             {
-                ctgr = (CategoryType)Enum.Parse(typeof(CategoryType), category);
+                Console.WriteLine($"\"{category}\" adlı kateqoriya mövcud deyil. Yenidən cəhd edin.");
+                Console.Write("Kateqoriya: ");
+                category = Console.ReadLine();
             }
-            catch
-            {
-                Console.WriteLine("Bu kategoriya movcud deyil");
-                Console.WriteLine($"\"{category}\" adlı kateqoriya əlavə edə bilərsiniz.");
-                return;
-            }
+
+
             List<Product> products = Products.FindAll(p => p.Category == ctgr);
             if (products.Count != 0)
             {
                 ShowProducts(products);
             }
-            else Console.WriteLine($"{category} kateqoriyası mövcu deyil.");
+            else Console.WriteLine($"{category} kateqoriyasında məhsul mövcud deyil.");
 
         }
 
-        public void GetProductByPriceRange()
+        public void GetProductByPriceRange(string minPrice, string maxPrice)
         {
-            Console.Write("Minimum qiymət: ");
-            double minPrice;
-            string inpMinPrice = Console.ReadLine();
-            while (!double.TryParse(inpMinPrice, out minPrice))
+            if (To<double>(minPrice) <= To<double>(maxPrice))
             {
-                Console.WriteLine("Rəqəm daxil etməlisiniz.");
-                inpMinPrice = Console.ReadLine();
-            }
-
-            Console.Write("Maksimum qiymət: ");
-            double maxPrice;
-            string inpMaxPrice = Console.ReadLine();
-            while (!double.TryParse(inpMaxPrice, out maxPrice))
-            {
-                Console.WriteLine("Rəqəm daxil etməlisiniz.");
-                inpMaxPrice = Console.ReadLine();
-            }
-            List<Product> products = Products.FindAll(p => p.Price >= minPrice && p.Price <= maxPrice);
-            ShowProducts(products);
-        }
-        public void GetProductByName()
-        {
-            Console.WriteLine("Məhsulun adı: ");
-            string name=Console.ReadLine();
-            List<Product> products = Products.FindAll(p => p.Name.Contains(name,StringComparison.OrdinalIgnoreCase));
-            if (products.Count != 0)
-            {
+                List<Product> products = Products.FindAll(p => p.Price >= To<double>(minPrice) && p.Price <= To<double>(maxPrice));
                 ShowProducts(products);
             }
-            else Console.WriteLine($"{name} adlı məhsul mövcud deyil.");
-
+            else Console.WriteLine("Məbləğ aralığı düzgün daxil edilməyib");
+        }
+        public List<Product> GetProductByName(string productName)
+        {
+            return Products.FindAll(p => p.Name.Contains(productName,StringComparison.OrdinalIgnoreCase));            
         }
 
-        public void AddSale(int productCount) 
+        public void AddSale() 
         {
             Sale sale = new Sale();
             sale.SaleNo = ++SaleId;
             sale.SaleItems = new List<SaleItem>();
-            
-            for (int i = 1; i<=productCount; i++)
+            ConsoleKeyInfo key=default(ConsoleKeyInfo);
+            int i = 1;
+            do
             {
                 SaleItem item = new SaleItem();
-                Console.Write($"{i} Məhsulun kodu: ");
+                Console.Write($"\n{i} Məhsulun kodu: ");
                 string prodCode = Console.ReadLine();
                 Product saledProd = Products.Find(p => p.ProductCode == prodCode);
-                if (saledProd!=null && saledProd.Quantity>=productCount)
+                if (saledProd != null)
                 {
                     Console.Write("Məhsulun sayı: ");
                     string ItemCount = Console.ReadLine();
-                    int SaleItemCount;
-                    while (!int.TryParse(ItemCount, out SaleItemCount))
+                    int SaleItemCount = To<int>(ItemCount);
+                    while (SaleItemCount == 0)
                     {
-                        Console.WriteLine("Reqem daxil etmelisinz.");
+                        Console.Write("Məhsulun sayı 0 ola bilməz. Yenidən daxil edin: ");
                         ItemCount = Console.ReadLine();
+                        SaleItemCount = To<int>(ItemCount);
+                    }
+                    if (saledProd.Quantity == 0)
+                    {
+                        Console.WriteLine($"{prodCode} kodlu məhsul bitib!");
+                        continue;
+                    }
+                    else if (saledProd.Quantity >= SaleItemCount)
+                    {
+                        item.prodCount = SaleItemCount;
+                        saledProd.Quantity -= SaleItemCount;
+                    
+                    }
+                    else
+                    {
+                        item.prodCount = saledProd.Quantity;
+                        saledProd.Quantity = 0;
+                        
                     }
 
                     item.No = i;
                     item.product = saledProd;
-                    item.prodCount = SaleItemCount;
-                    saledProd.Quantity -= SaleItemCount;
                     Console.WriteLine(saledProd.Name);
                     sale.SaleItems.Add(item);
-                    sale.Amount += saledProd.Price*SaleItemCount;
+                    sale.Amount += saledProd.Price * item.prodCount;
+                    i++;
+
                 }
                 else
                 {
                     Console.WriteLine($"{prodCode} kodlu məhsul mövcud deyil!");
                     continue;
                 }
-                
-            }
+                Console.WriteLine("Prosesi dayandırmaq üçün \"Sapce\" düyməsini, davam etmək üçün isə digər istənilən düyməni klikləyin.");
+                key = Console.ReadKey();
+            } while (key.Key!=ConsoleKey.Spacebar);
 
             sale.date = DateTime.Now;
 
-            Console.WriteLine(sale.SaleItems.Count);
-            Sales.Add(sale);
-            showSale(sale.SaleNo.ToString());
+            if (sale.SaleItems.Count > 0)
+            {
+                Sales.Add(sale);
+                showSale(sale.SaleNo.ToString());
+                Console.WriteLine("Satış əlavə edildi!");
+            }
+            else Console.WriteLine("Satış əlavə edilmədi!");
         }
 
         public void showSale(string SaleNo)
@@ -399,44 +377,58 @@ namespace MarketManagementSystem.Infrastructure.Services
             Sale sale = Sales.Find(s => s.SaleNo.ToString() == SaleNo);
             if (sale != null) {
                 Console.WriteLine();
-                var table = new ConsoleTable("No", "Product Name", "Count", "Price", "Amount");
-                foreach (var item in sale.SaleItems)
+                if (sale.SaleItems.Count > 0)
                 {
-                    table.AddRow(item.No, item.product.Name, item.prodCount, item.product.Price, (item.prodCount * item.product.Price).ToString("#.##"));
+                    var table = new ConsoleTable("No", "Item No", "Product Name", "Count", "Price", "Amount");
+                    int i = 1;
+                    foreach (var item in sale.SaleItems)
+                    {
+                        table.AddRow(i, item.No, item.product.Name, item.prodCount, item.product.Price, (item.prodCount * item.product.Price).ToString("0.00"));
+                        i++;
+                    }
+                    sale.Amount = sale.SaleItems.Sum(s => s.prodCount * s.product.Price);
+
+                    table.AddRow("", "", "", "", "", "");
+                    table.AddRow("Total Amount:", "", "", "", "", sale.Amount.ToString("0.00"));
+                    table.AddRow("Date: ", sale.date, "", "", "", "");
+
+                    table.Write((Format.Minimal));
+
                 }
-                table.AddRow("", "", "", "", "");
-                table.AddRow("Total Amount:", "", "", "", sale.Amount.ToString("#.##"));
-                table.AddRow("Date: ", sale.date, "", "", "");
-                table.Write((Format.Minimal));
+                else Console.WriteLine("Satış siyahısı boşdur!");
             }
             else Console.WriteLine($"{SaleNo} nömrəli satış mövcud deyil.");
-            //Console.table("","");
         }
         public void DeleteSaleItem(string saleNo)
         {
             Sale sale = Sales.Find(s => s.SaleNo.ToString() == saleNo);
             if (sale != null)
             {
-                Console.WriteLine("Çıxarılacaq məhsulun kodu: ");
-                string prodCode = Console.ReadLine();
-                SaleItem item = sale.SaleItems.Find(s => s.product.ProductCode == prodCode);
+                Console.Write("Çıxarılacaq məhsulun nömrəsi: ");
+                string prodNo = Console.ReadLine();
+                int No = To<int>(prodNo);
+                SaleItem item = sale.SaleItems.Find(s => s.No == No);
                 if (item != null)
                 {
-                    Console.WriteLine("Çıxarılacaq məhsulun sayı: ");
-                    int delProdCount;
+                    Console.Write("Çıxarılacaq məhsulun sayı: ");
+                    
                     string count= Console.ReadLine();
-                    while (!int.TryParse(count, out delProdCount))
-                    {
-                        Console.WriteLine("Rəqəm daxil etməlisiniz.");
-                        count = Console.ReadLine();
-                    }
+                    int delProdCount = To<int>(count);
 
                     if (delProdCount <= item.prodCount)
                     {
                         item.prodCount -= delProdCount;
-                        Products.Find(p => p.ProductCode == prodCode).Quantity += delProdCount;
+                        if (item.prodCount == 0)
+                        {
+                            sale.SaleItems.Remove(item);
+                        }
+                        Products.Find(p => p.ProductCode == item.product.ProductCode).Quantity += delProdCount;
+                        Console.WriteLine("Məhsul satışdan silindi.");
+                        showSale(saleNo);
                     }
-                }                
+                    else Console.WriteLine($"{count} miqdardan az satılıb.");
+                }
+                else Console.WriteLine("Məhsul nömrəsi düzgün daxil edilməyib!");
             }
             else Console.WriteLine($"{saleNo} nömrəli satış mövcud deyil!");
         }
@@ -449,10 +441,8 @@ namespace MarketManagementSystem.Infrastructure.Services
                 foreach  (SaleItem item in saleItems)
                 {
                   Products.Find(p=>p.ProductCode==item.product.ProductCode).Quantity+= item.prodCount;
-                    Console.WriteLine(item.prodCount);
                 }
                 Sales.Remove(sale);
-                
             }
             else Console.WriteLine($"{saleNo} nömrəli satış mövcud deyil!");
         }
@@ -479,13 +469,18 @@ namespace MarketManagementSystem.Infrastructure.Services
 
         public void ShowSales(List <Sale> sales)
         {
-            var table = new ConsoleTable("No","Məhsul sayı","Məbləğ","Tarix");
-            
-            foreach (Sale item in sales)
+            if (sales.Count > 0)
             {
-                table.AddRow(item.SaleNo, item.SaleItems.Count,item.Amount,item.date);
+                var table = new ConsoleTable("No", "Məhsul sayı", "Məbləğ", "Tarix");
+                int i = 1;
+                foreach (Sale item in sales)
+                {
+                    table.AddRow(i, item.SaleItems.Count, item.Amount.ToString("0.00"), item.date);
+                    i++;
+                }
+                table.Write();
             }
-            table.Write();
+            else Console.WriteLine("Satış siyahısı boşdur.");
         }
     }
 }
