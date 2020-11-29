@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using MarketManagementSystem.Infrastructure.Interfaces;
 using MarketManagementSystem.Infrastructure.Enums;
 using ConsoleTables;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Globalization;
 
 namespace MarketManagementSystem.Infrastructure.Services
 {

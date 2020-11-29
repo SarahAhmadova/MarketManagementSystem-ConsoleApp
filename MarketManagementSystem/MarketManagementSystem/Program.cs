@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using MarketManagementSystem.Infrastructure.Enums;
 using MarketManagementSystem.Infrastructure.Models;
@@ -34,7 +33,8 @@ namespace MarketManagementSystem
         }
 
         #endregion
-        #region Check Is Number
+
+        #region Check Is Date
         public static DateTime ToDate(string value)
         {
             bool converted = false;
@@ -58,6 +58,7 @@ namespace MarketManagementSystem
         }
 
         #endregion
+
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
@@ -334,17 +335,13 @@ namespace MarketManagementSystem
         }
         static void addSale()
         {
-            //Console.Write("Satışdakı məhsul növlərinin sayını daxil edin: ");
-            //string prodCount = Console.ReadLine();
-            //int productCount = To<int>(prodCount);
-
             operations.AddSale();
             Console.WriteLine("==========================================================================================");
             showSaleChoices();
         }
         static void deleteSale()
         {
-            Console.WriteLine("Satış nömrəsini daxil edin: ");
+            Console.Write("Satış nömrəsini daxil edin: ");
             string saleNo = Console.ReadLine();
             operations.DeleteSale(saleNo);
             showSaleChoices();

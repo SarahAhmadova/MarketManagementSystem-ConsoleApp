@@ -1,7 +1,4 @@
 ﻿using MarketManagementSystem.Infrastructure.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MarketManagementSystem.Infrastructure.Models
 {

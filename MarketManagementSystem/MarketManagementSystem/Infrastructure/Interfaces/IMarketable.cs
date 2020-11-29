@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using MarketManagementSystem.Infrastructure.Models;
 
 namespace MarketManagementSystem.Infrastructure.Interfaces
