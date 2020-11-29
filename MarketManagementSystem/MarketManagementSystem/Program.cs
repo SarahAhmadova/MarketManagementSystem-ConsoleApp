@@ -4,6 +4,8 @@ using System.Text;
 using MarketManagementSystem.Infrastructure.Enums;
 using MarketManagementSystem.Infrastructure.Models;
 using MarketManagementSystem.Infrastructure.Services;
+using MarketManagementSystem.Infrastructure.Exceptions;
+
 
 namespace MarketManagementSystem
 {
@@ -35,7 +37,7 @@ namespace MarketManagementSystem
         #endregion
 
         #region Check Is Date
-        public static DateTime ToDate(string value)
+           public static DateTime ToDate(string value)
         {
             bool converted = false;
             DateTime date = default(DateTime);
@@ -189,14 +191,28 @@ namespace MarketManagementSystem
         {
             Console.Write("Düzəliş etmək istədiyiniz məhsul kodunu daxil edin: ");
             string prodCode = Console.ReadLine();
-            operations.EditProdInfo(prodCode);
+            try
+            {
+                operations.EditProdInfo(prodCode);
+            }
+            catch (ProdCodeException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             showProductChoices();
         }
         static void DeleteProduct()
         {
             Console.Write("Silmək istədiyiniz məhsul kodunu daxil edin: ");
             string prodCode = Console.ReadLine();
-            operations.DeleteProduct(prodCode);
+            try
+            {
+                operations.DeleteProduct(prodCode);
+            }
+            catch (ProdCodeException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             showProductChoices();
         }
         static void showProductsByCategory()
@@ -217,7 +233,14 @@ namespace MarketManagementSystem
 
             Console.Write("Kateqoriyanı daxil edin: ");
             string category = Console.ReadLine();
-            operations.GetProductByCategory(category);
+            try
+            {
+                operations.GetProductByCategory(category);
+            }
+            catch (ProdCategoryException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             showProductChoices();
         }
         static void showProductsByPriceRange()
@@ -343,14 +366,28 @@ namespace MarketManagementSystem
         {
             Console.Write("Satış nömrəsini daxil edin: ");
             string saleNo = Console.ReadLine();
-            operations.DeleteSale(saleNo);
+            try
+            {
+                operations.DeleteSale(saleNo);
+            }
+            catch (SaleNoException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             showSaleChoices();
         }
         static void deleteSaleItem()
         {
             Console.Write("Satış nömrəsi: ");
             string saleNo = Console.ReadLine();
-            operations.DeleteSaleItem(saleNo);
+            try
+            {
+                operations.DeleteSaleItem(saleNo);
+            }
+            catch (SaleNoException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             Console.WriteLine("==========================================================================================");
             showSaleChoices();
         }

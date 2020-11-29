@@ -1,57 +1,66 @@
-﻿using MarketManagementSystem.Infrastructure.Models;
-using System;
+﻿using System;
+using System.Linq;
+using System.Text;
 using System.Collections.Generic;
+using MarketManagementSystem.Infrastructure.Models;
+using MarketManagementSystem.Infrastructure.Exceptions;
 using MarketManagementSystem.Infrastructure.Interfaces;
 using MarketManagementSystem.Infrastructure.Enums;
 using ConsoleTables;
-using System.Linq;
-using System.Text;
+
 
 namespace MarketManagementSystem.Infrastructure.Services
 {
 
     public class Marketable : IMarketable
     {
-      
         private int SaleId = 1;
         public List<Sale> Sales { get; set; }
+        public List<Product> Products { get; set; }
+
+        // ========================== FILL LISTS ===================================
         public Marketable() {
             Console.OutputEncoding = Encoding.UTF8;
+            Sales = new List<Sale>();
+            Products = new List<Product>();
 
-            // Default filled Sales List
-            Sales = new List<Sale> {
-                new Sale{
-                    SaleNo=SaleId,
-                    SaleItems = new List<SaleItem>
-                    {
-                        new SaleItem
-                        {
-                            No=1,
-                            product=Products.Find(p=>p.ProductCode=="009068"),
-                            prodCount=10
-                        }
+            // ====================== Default filled PRODUCT List ==========================
+            Products = _products;
 
-                    }
-                    ,date=new DateTime(2020,11,20),
-                    Amount= 210
-                },
-                new Sale{
-                    SaleNo=++SaleId,
-                    SaleItems = new List<SaleItem>
-                    {
-                        new SaleItem
-                        {
-                            No=1,
-                            product = Products.Find(p=>p.ProductCode=="005631"),
-                            prodCount=20
-                        }
+            // ====================== Default filled SALE List ==========================
+            //Sales = new List<Sale> {
+            //    new Sale{
+            //        SaleNo=SaleId,
+            //        SaleItems = new List<SaleItem>
+            //        {
+            //            new SaleItem
+            //            {
+            //                No=1,
+            //                product=Products.Find(p=>p.ProductCode=="009068"),
+            //                prodCount=10
+            //            }
 
-                    }
-                    ,date=new DateTime(2020,11,22),
-                    Amount= 70
-                }
-            };
-            
+            //        }
+            //        ,date=new DateTime(2020,11,20),
+            //        Amount= Products.Find(p=>p.ProductCode=="009068").Price*10
+            //    },
+            //    new Sale{
+            //        SaleNo=++SaleId,
+            //        SaleItems = new List<SaleItem>
+            //        {
+            //            new SaleItem
+            //            {
+            //                No=1,
+            //                product = Products.Find(p=>p.ProductCode=="005631"),
+            //                prodCount=20
+            //            }
+
+            //        }
+            //        ,date=new DateTime(2020,11,22),
+            //        Amount= Products.Find(p=>p.ProductCode=="005631").Price*20
+            //    }
+            //};
+
         }
         List<Product> _products = new List<Product> {
            new Product{
@@ -83,7 +92,6 @@ namespace MarketManagementSystem.Infrastructure.Services
                ProductCode="005631"
             }
         };
-        public List<Product> Products => _products;
 
 
         #region Check Is Number
@@ -110,9 +118,11 @@ namespace MarketManagementSystem.Infrastructure.Services
 
         #endregion
 
+        // ========================== PRODUCT METHODS =============================
+        #region Product
         public void AddProduct()
         {
-            
+
             Product prod = new Product();
 
             #region productName
@@ -137,7 +147,7 @@ namespace MarketManagementSystem.Infrastructure.Services
             Array nums = Enum.GetValues(typeof(CategoryType));
             foreach (var item in nums)
             {
-                Console.WriteLine(Array.IndexOf(nums, item) + " - " + item );
+                Console.WriteLine(Array.IndexOf(nums, item) + " - " + item);
             }
             Console.WriteLine("----------------------------------------------------------");
 
@@ -147,7 +157,7 @@ namespace MarketManagementSystem.Infrastructure.Services
             string category = Console.ReadLine();
 
             CategoryType ctgr;
-             while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
+            while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
             {
                 Console.WriteLine($"\"{category}\" adlı kateqoriya mövcud deyil. Yenidən cəhd edin.");
                 Console.Write("Məhsulun kateqoriyası: ");
@@ -169,14 +179,14 @@ namespace MarketManagementSystem.Infrastructure.Services
             prod.ProductCode = Console.ReadLine();
             #endregion
 
-            _products.Add(prod);
+            Products.Add(prod);
         }
-      
+
         public void EditProdInfo(string ProductCode)
         {
-            
-            Product prod = Products.Find(p=>p.ProductCode==ProductCode);
-            if (prod!=null)
+
+            Product prod = Products.Find(p => p.ProductCode == ProductCode);
+            if (prod != null)
             {
                 #region productName
                 Console.WriteLine($"Məhsulun adı: {prod.Name}");
@@ -234,7 +244,7 @@ namespace MarketManagementSystem.Infrastructure.Services
                 Console.WriteLine($"\"{ProductCode}\" kodlu məhsul məlumatlarına düzəliş edildi. ");
 
             }
-            else Console.WriteLine($"{ProductCode} kodlu məhsul mövcud deyil.");
+            else throw new ProdCodeException(ProductCode);
         }
 
         public void DeleteProduct(string ProductCode)
@@ -245,7 +255,7 @@ namespace MarketManagementSystem.Infrastructure.Services
                 Products.Remove(delItem);
                 Console.WriteLine($"{delItem.Name} məhsulu silindi.");
             }
-            else Console.WriteLine($"{ProductCode} kodlu məhsul mövcud deyil.");
+            else throw new ProdCodeException(ProductCode);
         }
 
         // ------------------ SHOWS SELECTED PRODUCT LIST ON CONSOLE --------------------
@@ -264,10 +274,10 @@ namespace MarketManagementSystem.Infrastructure.Services
             else Console.WriteLine("Məhsul siyahısı boşdur.");
         }
 
-        
+
         public void GetProductByCategory(string category)
         {
-           
+
             CategoryType ctgr;
             while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
             {
@@ -276,13 +286,12 @@ namespace MarketManagementSystem.Infrastructure.Services
                 category = Console.ReadLine();
             }
 
-
             List<Product> products = Products.FindAll(p => p.Category == ctgr);
             if (products.Count != 0)
             {
                 ShowProducts(products);
             }
-            else Console.WriteLine($"{category} kateqoriyasında məhsul mövcud deyil.");
+            else throw new ProdCategoryException(category);
 
         }
 
@@ -297,15 +306,19 @@ namespace MarketManagementSystem.Infrastructure.Services
         }
         public List<Product> GetProductByName(string productName)
         {
-            return Products.FindAll(p => p.Name.Contains(productName,StringComparison.OrdinalIgnoreCase));            
+            return Products.FindAll(p => p.Name.Contains(productName, StringComparison.OrdinalIgnoreCase));
         }
 
-        public void AddSale() 
+        #endregion
+
+        // =========================== SALE METHODS ===============================
+        #region Sale
+        public void AddSale()
         {
             Sale sale = new Sale();
             sale.SaleNo = ++SaleId;
             sale.SaleItems = new List<SaleItem>();
-            ConsoleKeyInfo key=default(ConsoleKeyInfo);
+            ConsoleKeyInfo key = default(ConsoleKeyInfo);
             int i = 1;
             do
             {
@@ -333,13 +346,13 @@ namespace MarketManagementSystem.Infrastructure.Services
                     {
                         item.prodCount = SaleItemCount;
                         saledProd.Quantity -= SaleItemCount;
-                    
+
                     }
                     else
                     {
                         item.prodCount = saledProd.Quantity;
                         saledProd.Quantity = 0;
-                        
+
                     }
 
                     item.No = i;
@@ -357,7 +370,7 @@ namespace MarketManagementSystem.Infrastructure.Services
                 }
                 Console.WriteLine("Prosesi dayandırmaq üçün \"Sapce\" düyməsini, davam etmək üçün isə digər istənilən düyməni klikləyin.");
                 key = Console.ReadKey();
-            } while (key.Key!=ConsoleKey.Spacebar);
+            } while (key.Key != ConsoleKey.Spacebar);
 
             sale.date = DateTime.Now;
 
@@ -373,29 +386,37 @@ namespace MarketManagementSystem.Infrastructure.Services
         public void showSale(string SaleNo)
         {
             Sale sale = Sales.Find(s => s.SaleNo.ToString() == SaleNo);
-            if (sale != null) {
-                Console.WriteLine();
-                if (sale.SaleItems.Count > 0)
+            try
+            {
+                if (sale != null)
                 {
-                    var table = new ConsoleTable("No", "Item No", "Product Name", "Count", "Price", "Amount");
-                    int i = 1;
-                    foreach (var item in sale.SaleItems)
+                    Console.WriteLine();
+                    if (sale.SaleItems.Count > 0)
                     {
-                        table.AddRow(i, item.No, item.product.Name, item.prodCount, item.product.Price, (item.prodCount * item.product.Price).ToString("0.00"));
-                        i++;
+                        var table = new ConsoleTable("No", "Item No", "Product Name", "Count", "Price", "Amount");
+                        int i = 1;
+                        foreach (var item in sale.SaleItems)
+                        {
+                            table.AddRow(i, item.No, item.product.Name, item.prodCount, item.product.Price, (item.prodCount * item.product.Price).ToString("0.00"));
+                            i++;
+                        }
+                        sale.Amount = sale.SaleItems.Sum(s => s.prodCount * s.product.Price);
+
+                        table.AddRow("", "", "", "", "", "");
+                        table.AddRow("Total Amount:", "", "", "", "", sale.Amount.ToString("0.00"));
+                        table.AddRow("Date: ", sale.date, "", "", "Sale No:", sale.SaleNo);
+
+                        table.Write((Format.Minimal));
+
                     }
-                    sale.Amount = sale.SaleItems.Sum(s => s.prodCount * s.product.Price);
-
-                    table.AddRow("", "", "", "", "", "");
-                    table.AddRow("Total Amount:", "", "", "", "", sale.Amount.ToString("0.00"));
-                    table.AddRow("Date: ", sale.date, "", "", "", "");
-
-                    table.Write((Format.Minimal));
-
+                    else Console.WriteLine("Satış siyahısı boşdur!");
                 }
-                else Console.WriteLine("Satış siyahısı boşdur!");
+                else throw new SaleNoException(SaleNo);
             }
-            else Console.WriteLine($"{SaleNo} nömrəli satış mövcud deyil.");
+            catch (SaleNoException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         public void DeleteSaleItem(string saleNo)
         {
@@ -409,8 +430,8 @@ namespace MarketManagementSystem.Infrastructure.Services
                 if (item != null)
                 {
                     Console.Write("Çıxarılacaq məhsulun sayı: ");
-                    
-                    string count= Console.ReadLine();
+
+                    string count = Console.ReadLine();
                     int delProdCount = To<int>(count);
 
                     if (delProdCount <= item.prodCount)
@@ -428,7 +449,7 @@ namespace MarketManagementSystem.Infrastructure.Services
                 }
                 else Console.WriteLine("Məhsul nömrəsi düzgün daxil edilməyib!");
             }
-            else Console.WriteLine($"{saleNo} nömrəli satış mövcud deyil!");
+            else throw new SaleNoException();
         }
         public void DeleteSale(string saleNo)
         {
@@ -436,16 +457,16 @@ namespace MarketManagementSystem.Infrastructure.Services
             if (sale != null)
             {
                 List<SaleItem> saleItems = sale.SaleItems;
-                foreach  (SaleItem item in saleItems)
+                foreach (SaleItem item in saleItems)
                 {
-                  Products.Find(p=>p.ProductCode==item.product.ProductCode).Quantity+= item.prodCount;
+                    Products.Find(p => p.ProductCode == item.product.ProductCode).Quantity += item.prodCount;
                 }
                 Sales.Remove(sale);
             }
-            else Console.WriteLine($"{saleNo} nömrəli satış mövcud deyil!");
+            else throw new SaleNoException(saleNo);
         }
 
-        public List<Sale> GetSalesByAmountRange(double mnAmount, double  mxAmount)
+        public List<Sale> GetSalesByAmountRange(double mnAmount, double mxAmount)
         {
             return Sales.FindAll(s => s.Amount >= mnAmount && s.Amount <= mxAmount);
         }
@@ -465,7 +486,7 @@ namespace MarketManagementSystem.Infrastructure.Services
             return Sales.Find(s => s.SaleNo.ToString() == SaleNo);
         }
 
-        public void ShowSales(List <Sale> sales)
+        public void ShowSales(List<Sale> sales)
         {
             if (sales.Count > 0)
             {
@@ -480,5 +501,6 @@ namespace MarketManagementSystem.Infrastructure.Services
             }
             else Console.WriteLine("Satış siyahısı boşdur.");
         }
+        #endregion
     }
 }
