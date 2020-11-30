@@ -13,6 +13,12 @@ namespace MarketManagementSystem
     {
         static Marketable operations = new Marketable();
         #region Check Is Number
+        /// <summary>
+        /// Converts String type to given Number Type 
+        /// </summary>
+        /// <typeparam name="T">required DataType</typeparam>
+        /// <param name="value">Given string value</param>
+        /// <returns>Number typed value</returns>
         public static T To<T>(string value)
         {
             bool converted = false;
@@ -37,6 +43,11 @@ namespace MarketManagementSystem
         #endregion
 
         #region Check Is Date
+        /// <summary>
+        /// Converts String type to DateTime type
+        /// </summary>
+        /// <param name="value">Must be date format</param>
+        /// <returns>DateTime value</returns>
            public static DateTime ToDate(string value)
         {
             bool converted = false;

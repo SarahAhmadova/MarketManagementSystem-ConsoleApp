@@ -95,6 +95,12 @@ namespace MarketManagementSystem.Infrastructure.Services
 
 
         #region Check Is Number
+        /// <summary>
+        /// Converts string value to Number type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static T To<T>(string value)
         {
             bool converted = false;
@@ -121,8 +127,9 @@ namespace MarketManagementSystem.Infrastructure.Services
         // ========================== PRODUCT METHODS =============================
         #region Product
 
-        // ---------------------------------------- ADD PRODUCT ----------------------------------------------
-
+        /// <summary>
+        /// Add product to Product List
+        /// </summary>
         public void AddProduct()
         {
 
@@ -141,34 +148,7 @@ namespace MarketManagementSystem.Infrastructure.Services
             #endregion
 
             #region productCategory
-
-            // ------------------------------------   SHOW CATEGORIES ---------------------------------------
-
-            Console.WriteLine("----------------------------------------------------------");
-            Console.WriteLine("Məhsulun bu kategoriyaları arasında seçim edə bilərsiniz: ");
-
-            Array nums = Enum.GetValues(typeof(CategoryType));
-            foreach (var item in nums)
-            {
-                Console.WriteLine(Array.IndexOf(nums, item) + " - " + item);
-            }
-            Console.WriteLine("----------------------------------------------------------");
-
-            // --------------------------------------  ASSIGN CATEGORY ---------------------------------------
-
-            Console.Write("Məhsulun kateqoriyası: ");
-            string category = Console.ReadLine();
-
-            CategoryType ctgr;
-            while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
-            {
-                Console.WriteLine($"\"{category}\" adlı kateqoriya mövcud deyil. Yenidən cəhd edin.");
-                Console.Write("Məhsulun kateqoriyası: ");
-                category = Console.ReadLine();
-            }
-
-            prod.Category = ctgr;
-
+            prod.Category = showCategories();
             #endregion
 
             #region productQuantitiy
@@ -192,8 +172,10 @@ namespace MarketManagementSystem.Infrastructure.Services
             Products.Add(prod);
         }
 
-        // ---------------------------------------- EDIT PRODUCT ---------------------------------------------
-
+        /// <summary>
+        /// Edit existing product data 
+        /// </summary>
+        /// <param name="ProductCode">Product Code</param>
         public void EditProdInfo(string ProductCode)
         {
 
@@ -216,33 +198,9 @@ namespace MarketManagementSystem.Infrastructure.Services
                 #endregion
 
                 #region productCategory
-
-                // -------------------------------------- SHOW CATEGORIES ----------------------------------------
-
-                Console.WriteLine("----------------------------------------------------------");
-                Console.WriteLine("Məhsulun bu kategoriyaları arasında seçim edə bilərsiniz: ");
-                Array nums = Enum.GetValues(typeof(CategoryType));
-                foreach (var item in nums)
-                {
-                    Console.WriteLine(Array.IndexOf(nums, item) + " - " + item);
-                }
-                Console.WriteLine("----------------------------------------------------------");
-
-                // -------------------------------------- ASSIGN CATEGORY ------------------------------------------
-
                 Console.WriteLine($"Məhsulun kateqoriyası: {prod.Category}");
-                Console.Write("Kateqoriya daxil edin: ");
-                string category = Console.ReadLine();
 
-                CategoryType ctgr;
-                while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
-                {
-                    Console.WriteLine($"\"{category}\" adlı kateqoriya mövcud deyil. Yenidən cəhd edin.");
-                    Console.Write("Məhsulun kateqoriyası: ");
-                    category = Console.ReadLine();
-                }
-
-                prod.Category = ctgr;
+                prod.Category = showCategories();
                 Console.WriteLine("");
                 #endregion
 
@@ -259,8 +217,10 @@ namespace MarketManagementSystem.Infrastructure.Services
             else throw new ProdCodeException(ProductCode);
         }
 
-        // ---------------------------------------- DELETE PRODUCT -------------------------------------------
-
+        /// <summary>
+        /// Delete product from Product List
+        /// </summary>
+        /// <param name="ProductCode">Product Code</param>
         public void DeleteProduct(string ProductCode)
         {
             Product delItem = Products.Find(p => p.ProductCode == ProductCode);
@@ -272,8 +232,10 @@ namespace MarketManagementSystem.Infrastructure.Services
             else throw new ProdCodeException(ProductCode);
         }
 
-        // ------------------------------ SHOWS SELECTED PRODUCT LIST ON CONSOLE -----------------------------
-
+        /// <summary>
+        /// Show product list 
+        /// </summary>
+        /// <param name="list">Product list to show</param>
         public void ShowProducts(List<Product> list)
         {
 
@@ -289,8 +251,10 @@ namespace MarketManagementSystem.Infrastructure.Services
             else Console.WriteLine("Məhsul siyahısı boşdur.");
         }
 
-        // -------------------------------- SHOW PRODCUT LIST BY CATEGORY ------------------------------------
-
+        /// <summary>
+        /// Show product list by selected Category
+        /// </summary>
+        /// <param name="category">Product Category</param>
         public void GetProductByCategory(string category)
         {
 
@@ -311,8 +275,11 @@ namespace MarketManagementSystem.Infrastructure.Services
 
         }
 
-        // -------------------------------- SHOW PRODCUT LIST BY PRICE RANGE ---------------------------------
-
+        /// <summary>
+        /// Show product list by selected Price range
+        /// </summary>
+        /// <param name="minPrice">Minimum price</param>
+        /// <param name="maxPrice">Maximum price</param>
         public void GetProductByPriceRange(string minPrice, string maxPrice)
         {
             if (To<double>(minPrice) <= To<double>(maxPrice))
@@ -323,11 +290,48 @@ namespace MarketManagementSystem.Infrastructure.Services
             else Console.WriteLine("Məbləğ aralığı düzgün daxil edilməyib");
         }
 
-        // ------------------------------------ SHOW PRODCUTS BY NAME ----------------------------------------
-
+        /// <summary>
+        /// Finds products by given text
+        /// </summary>
+        /// <param name="productName">Text to search consisting Product name</param>
+        /// <returns>Product list by Name</returns>
         public List<Product> GetProductByName(string productName)
         {
             return Products.FindAll(p => p.Name.Contains(productName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Show existing product categories and requires to select one of shown categories
+        /// </summary>
+        /// <returns>Selected product category</returns>
+        public CategoryType showCategories()
+        {
+            // ------------------------------------   SHOW CATEGORIES ---------------------------------------
+
+            Console.WriteLine("----------------------------------------------------------");
+            Console.WriteLine("Məhsulun bu kategoriyaları arasında seçim edə bilərsiniz: ");
+
+            Array nums = Enum.GetValues(typeof(CategoryType));
+            foreach (var item in nums)
+            {
+                Console.WriteLine(Array.IndexOf(nums, item) + " - " + item);
+            }
+            Console.WriteLine("----------------------------------------------------------");
+
+
+            // -------------------------------------- ASSIGN CATEGORY ------------------------------------------
+
+            Console.Write("Məhsulun kateqoriyası: ");
+            string category = Console.ReadLine();
+
+            CategoryType ctgr;
+            while (!Enum.TryParse(category, out ctgr) || !Enum.IsDefined(typeof(CategoryType), ctgr))
+            {
+                Console.WriteLine($"\"{category}\" adlı kateqoriya mövcud deyil. Yenidən cəhd edin.");
+                Console.Write("Məhsulun kateqoriyası: ");
+                category = Console.ReadLine();
+            }
+            return ctgr;
         }
 
         #endregion
@@ -335,8 +339,9 @@ namespace MarketManagementSystem.Infrastructure.Services
         // =========================== SALE METHODS ===============================
         #region Sale
 
-        // ------------------------------------------- ADD SALE -------------------------------------------------
-
+        /// <summary>
+        /// Creates Sale, adds Sale Items untill click SpaceBar button
+        /// </summary>
         public void AddSale()
         {
             Sale sale = new Sale();
@@ -390,6 +395,7 @@ namespace MarketManagementSystem.Infrastructure.Services
                     }
                     else
                     {
+                        // -----------------------------------> ASKS USER IF WANTS TO BUY LEFT PRODUCT
                         Console.WriteLine($"Daxil edilən miqdar qədər satış mümkün deyil. Mövcud məhsul sayı: {saledProd.Quantity} qədər satış edilsin mi? ");
                         Console.WriteLine("Təsdiqləmək üçün \"Enter\" düyməsini, əks halda digər istəlinən düyməni klikləyin.");
                         if (Console.ReadKey().Key==ConsoleKey.Enter)
@@ -427,8 +433,10 @@ namespace MarketManagementSystem.Infrastructure.Services
             else Console.WriteLine("Satış əlavə edilmədi!");
         }
 
-        // ------------------------------------------- SHOW SALE ------------------------------------------------
-
+        /// <summary>
+        /// Show Sale, including Sale No, Sale Date, Sale Items, Each Saled Product count, Prices, Amount
+        /// </summary>
+        /// <param name="SaleNo">Sale Number</param>
         public void showSale(string SaleNo)
         {
             Sale sale = Sales.Find(s => s.SaleNo.ToString() == SaleNo);
@@ -465,8 +473,10 @@ namespace MarketManagementSystem.Infrastructure.Services
             }
         }
 
-        // ------------------------------------------ DELETE SALE ITEM ------------------------------------------
-
+        /// <summary>
+        /// Decrease Sale Item Count by given Count
+        /// </summary>
+        /// <param name="saleNo">Sale number</param>
         public void DeleteSaleItem(string saleNo)
         {
             Sale sale = Sales.Find(s => s.SaleNo.ToString() == saleNo);
@@ -507,8 +517,10 @@ namespace MarketManagementSystem.Infrastructure.Services
             else throw new SaleNoException();
         }
 
-        // -------------------------------------------- DELETE SALE ---------------------------------------------
-
+        /// <summary>
+        /// Delete Sale from Sale List
+        /// </summary>
+        /// <param name="saleNo">Sale number</param>
         public void DeleteSale(string saleNo)
         {
             Sale sale = Sales.Find(s => s.SaleNo.ToString() == saleNo);
@@ -524,36 +536,52 @@ namespace MarketManagementSystem.Infrastructure.Services
             else throw new SaleNoException(saleNo);
         }
 
-        // ---------------------------------------- SALES BY AMOUNT RANGE ---------------------------------------
-
+        /// <summary>
+        /// Finds Sales by given Amount range
+        /// </summary>
+        /// <param name="mnAmount">Minimum amount</param>
+        /// <param name="mxAmount">Maximum amount</param>
+        /// <returns>Sale list by Amount range</returns>
         public List<Sale> GetSalesByAmountRange(double mnAmount, double mxAmount)
         {
             return Sales.FindAll(s => s.Amount >= mnAmount && s.Amount <= mxAmount);
         }
 
-        // ---------------------------------------- SALES BY DATE RANGE -----------------------------------------
-
+        /// <summary>
+        /// Finds Sales between two date
+        /// </summary>
+        /// <param name="startDate">First Sale date</param>
+        /// <param name="endDate">Last Sale date</param>
+        /// <returns>Sale list by Date range</returns>
         public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate)
         {
             return Sales.FindAll(s => s.date.Date >= startDate.Date && s.date.Date <= endDate.Date);
         }
 
-        // ------------------------------------------ SALES BY DAY ----------------------------------------------
-
+        /// <summary>
+        /// Finds Sales by given Date
+        /// </summary>
+        /// <param name="day">Sale Date</param>
+        /// <returns>Sale list by date</returns>
         public List<Sale> GetSalesByDay(DateTime day)
         {
             return Sales.FindAll(s => s.date.Date == day.Date);
         }
 
-        // ------------------------------------------ SALE BY SALE NO -------------------------------------------
-
+        /// <summary>
+        /// Finds Sale by given Sale number
+        /// </summary>
+        /// <param name="SaleNo">Sale number</param>
+        /// <returns>Sale by SaleNo</returns>
         public Sale GetSalesBySaleNo(string SaleNo)
         {
             return Sales.Find(s => s.SaleNo.ToString() == SaleNo);
         }
 
-        // ------------------------------------------ SHOW SALES LIST -------------------------------------------
-
+        /// <summary>
+        /// Show Sales by given Sale List
+        /// </summary>
+        /// <param name="sales">Sale List</param>
         public void ShowSales(List<Sale> sales)
         {
             if (sales.Count > 0)
