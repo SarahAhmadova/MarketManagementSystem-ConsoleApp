@@ -28,38 +28,38 @@ namespace MarketManagementSystem.Infrastructure.Services
             Products = _products;
 
             // ====================== Default filled SALE List ==========================
-            //Sales = new List<Sale> {
-            //    new Sale{
-            //        SaleNo=SaleId,
-            //        SaleItems = new List<SaleItem>
-            //        {
-            //            new SaleItem
-            //            {
-            //                No=1,
-            //                product=Products.Find(p=>p.ProductCode=="009068"),
-            //                prodCount=10
-            //            }
+            Sales = new List<Sale> {
+                new Sale{
+                    SaleNo=SaleId++,
+                    SaleItems = new List<SaleItem>
+                    {
+                        new SaleItem
+                        {
+                            No=1,
+                            product=Products.Find(p=>p.ProductCode=="009068"),
+                            prodCount=10
+                        }
 
-            //        }
-            //        ,date=new DateTime(2020,11,20),
-            //        Amount= Products.Find(p=>p.ProductCode=="009068").Price*10
-            //    },
-            //    new Sale{
-            //        SaleNo=++SaleId,
-            //        SaleItems = new List<SaleItem>
-            //        {
-            //            new SaleItem
-            //            {
-            //                No=1,
-            //                product = Products.Find(p=>p.ProductCode=="005631"),
-            //                prodCount=20
-            //            }
+                    }
+                    ,date=new DateTime(2020,11,20),
+                    Amount= Products.Find(p=>p.ProductCode=="009068").Price*10
+                },
+                new Sale{
+                    SaleNo=SaleId++,
+                    SaleItems = new List<SaleItem>
+                    {
+                        new SaleItem
+                        {
+                            No=1,
+                            product = Products.Find(p=>p.ProductCode=="005631"),
+                            prodCount=20
+                        }
 
-            //        }
-            //        ,date=new DateTime(2020,11,22),
-            //        Amount= Products.Find(p=>p.ProductCode=="005631").Price*20
-            //    }
-            //};
+                    }
+                    ,date=new DateTime(2020,11,22),
+                    Amount= Products.Find(p=>p.ProductCode=="005631").Price*20
+                }
+            };
 
         }
         List<Product> _products = new List<Product> {
@@ -316,7 +316,7 @@ namespace MarketManagementSystem.Infrastructure.Services
         public void AddSale()
         {
             Sale sale = new Sale();
-            sale.SaleNo = ++SaleId;
+            sale.SaleNo = SaleId++;
             sale.SaleItems = new List<SaleItem>();
             ConsoleKeyInfo key = default(ConsoleKeyInfo);
             int i = 1;
@@ -490,11 +490,11 @@ namespace MarketManagementSystem.Infrastructure.Services
         {
             if (sales.Count > 0)
             {
-                var table = new ConsoleTable("No", "Məhsul sayı", "Məbləğ", "Tarix");
+                var table = new ConsoleTable("No","Sale No", "Məhsul sayı", "Məbləğ", "Tarix");
                 int i = 1;
                 foreach (Sale item in sales)
                 {
-                    table.AddRow(i, item.SaleItems.Count, item.Amount.ToString("0.00"), item.date);
+                    table.AddRow(i, item.SaleNo, item.SaleItems.Count, item.Amount.ToString("0.00"), item.date);
                     i++;
                 }
                 table.Write();
