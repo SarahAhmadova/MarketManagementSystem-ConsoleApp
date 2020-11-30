@@ -6,7 +6,7 @@ namespace MarketManagementSystem.Infrastructure.Interfaces
 {
     interface IMarketable
     {
-        public List<Sale> Sales { get; set; }
+        // PRODUCT
         public List<Product> Products { get; }
         public void AddProduct();
         public void EditProdInfo(string ProductCode);
@@ -15,6 +15,8 @@ namespace MarketManagementSystem.Infrastructure.Interfaces
         public void GetProductByPriceRange(string minPrice, string maxPrice);
         public List<Product> GetProductByName(string productName);
 
+        // SALE
+        public List<Sale> Sales { get; set; }
         public void AddSale();
         public void DeleteSaleItem(string saleNo);
         public void ShowSales(List<Sale> sales);

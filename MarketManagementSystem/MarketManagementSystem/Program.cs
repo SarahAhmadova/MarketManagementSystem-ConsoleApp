@@ -353,7 +353,8 @@ namespace MarketManagementSystem
                               "- 5 Verilən tarix aralığına görə satışların göstərilməsi\n" +
                               "- 6 Verilən məbləğ aralığına görə satışların göstərilməsi\n" +
                               "- 7 Verilmiş bir tarixdə olan satışların göstərilməsi\n" +
-                              "- 8 Verilmiş nömrəyə əsasən həmin nömrəli satışın məlumatlarının göstərilməsi");
+                              "- 8 Verilmiş nömrəyə əsasən həmin nömrəli satışın məlumatlarının göstərilməsi\n" +
+                              "- 0 Satışlar üzrə əməliyyatlardan çıxış");
             Console.WriteLine("");
         }
         static void addSale()
