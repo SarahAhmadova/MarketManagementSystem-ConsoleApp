@@ -482,7 +482,7 @@ namespace MarketManagementSystem.Infrastructure.Services
             Sale sale = Sales.Find(s => s.SaleNo.ToString() == saleNo);
             if (sale != null)
             {
-                // ---------------------------  Input SaleNo To delete SaleItem -----------------------
+                // ---------------------------  Input ItemNo To delete SaleItem -----------------------
 
                 Console.Write("Çıxarılacaq məhsulun nömrəsi: ");
                 string prodNo = Console.ReadLine();
